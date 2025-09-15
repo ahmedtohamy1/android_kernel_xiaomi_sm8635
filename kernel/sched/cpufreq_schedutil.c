@@ -189,7 +189,46 @@ static unsigned int get_next_freq(struct sugov_policy *sg_policy,
 	return cpufreq_driver_resolve_freq(policy, freq);
 }
 
-static void sugov_get_util(struct sugov_cpu *sg_cpu)
+static const unsigned long factor[8] = { [0 ... 7] = 1280 - SCHED_CAPACITY_SCALE };
+
+static inline unsigned long apply_dvfs_headroom(unsigned long util, int cpu)
+{
+	unsigned long capacity = capacity_orig_of(cpu);
+	unsigned long delta;
+	unsigned long headroom;
+
+	if (util >= capacity)
+		return util;
+
+	/*
+	 * Quadratic taper the boosting at the top end as these are expensive and
+	 * we don't need that much of a big headroom as we approach max capacity
+	 */
+	delta = capacity - util;
+	headroom = (delta * delta * factor[cpu]) >> (SCHED_CAPACITY_SHIFT + 10);
+
+	return util + headroom;
+}
+
+
+unsigned long sugov_effective_cpu_perf(int cpu, unsigned long actual,
+				 unsigned long min,
+				 unsigned long max)
+{
+	/* Add dvfs headroom to actual utilization */
+	actual = apply_dvfs_headroom(actual, cpu);
+	/* Actually we don't need to target the max performance */
+	if (actual < max)
+		max = actual;
+
+	/*
+	 * Ensure at least minimum performance while providing more compute
+	 * capacity when possible.
+	 */
+	return max(min, max);
+}
+
+static void sugov_get_util(struct sugov_cpu *sg_cpu, unsigned long boost)
 {
 	struct rq *rq = cpu_rq(sg_cpu->cpu);
 
