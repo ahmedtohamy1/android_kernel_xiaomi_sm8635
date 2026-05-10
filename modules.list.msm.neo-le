@@ -76,7 +76,6 @@ clk-spmi-pmic-div.ko
 sdhci-msm.ko
 core_hang_detect.ko
 kryo_arm64_edac.ko
-sched-walt.ko
 gcc-neo.ko
 dispcc-neo.ko
 secure_buffer.ko

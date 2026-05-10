@@ -8,7 +8,6 @@ qcom_cpucp.ko
 iommu-logger.ko
 qcom-pdc.ko
 arm_smmu.ko
-sched-walt.ko
 cmd-db.ko
 qcom_rpmh.ko
 msm_geni_serial.ko

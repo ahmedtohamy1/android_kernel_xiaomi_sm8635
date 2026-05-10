@@ -29,7 +29,6 @@ qti-regmap-debugfs.ko
 proxy-consumer.ko
 qti-fixed-regulator.ko
 rpm-smd-regulator.ko
-sched-walt.ko
 debug-regulator.ko
 qcom-i2c-pmic.ko
 qcom-spmi-pmic.ko

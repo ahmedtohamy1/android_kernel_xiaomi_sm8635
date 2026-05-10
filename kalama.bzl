@@ -60,7 +60,6 @@ def define_kalama():
         "drivers/soc/qcom/mdt_loader.ko",
         "drivers/soc/qcom/mem_buf/mem_buf.ko",
         "drivers/soc/qcom/mem_buf/mem_buf_dev.ko",
-        "drivers/soc/qcom/msm_performance.ko",
         "drivers/soc/qcom/qcom_aoss.ko",
         "drivers/soc/qcom/qcom_rpmh.ko",
         "drivers/soc/qcom/qcom_wdt_core.ko",

@@ -17,7 +17,6 @@ smp2p.ko
 smp2p_sleepstate.ko
 qrtr.ko
 qrtr-smd.ko
-sched-walt.ko
 sched-walt-debug.ko
 glink_probe.ko
 glink_pkt.ko
