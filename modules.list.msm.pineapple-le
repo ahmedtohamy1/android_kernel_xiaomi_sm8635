@@ -28,7 +28,6 @@ pinctrl-msm.ko
 pinctrl-pineapple.ko
 pinctrl-cliffs.ko
 pinctrl-volcano.ko
-sched-walt.ko
 sched-walt-debug.ko
 thermal_pause.ko
 cpu_hotplug.ko
