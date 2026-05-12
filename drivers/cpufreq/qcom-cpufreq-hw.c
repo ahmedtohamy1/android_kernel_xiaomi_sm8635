@@ -23,6 +23,9 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/dcvsh.h>
 #include <linux/units.h>
+#include <linux/fie.h>
+
+
 
 #define LUT_MAX_ENTRIES			40U
 #define LUT_SRC				GENMASK(31, 30)
@@ -68,7 +71,8 @@ struct qcom_cpufreq_data {
 	void __iomem *pdmem_base;
 	struct resource *res;
 	const struct qcom_cpufreq_soc_data *soc_data;
-
+unsigned int max_freq;
+	int i;
 	/*
 	 * Mutex to synchronize between de-init sequence and re-starting LMh
 	 * polling/interrupts
@@ -831,6 +835,18 @@ static int qcom_cpufreq_hw_cpu_init(struct cpufreq_policy *policy)
 		else
 			data->pdmem_base = base;
 	}
+/*
+	 * Register this frequency domain with FIE now that the freq table is
+	 * populated. Scan the table for the max frequency since cpuinfo.max_freq
+	 * isn't set until after cpu_init returns.
+	 */
+	max_freq = 0;
+	for (i = 0; policy->freq_table[i].frequency != CPUFREQ_TABLE_END; i++) {
+		if (policy->freq_table[i].frequency != CPUFREQ_ENTRY_INVALID &&
+		    policy->freq_table[i].frequency > max_freq)
+			max_freq = policy->freq_table[i].frequency;
+	}
+	fie_init_cpu_domain(policy->cpus, max_freq);
 
 	ret = dev_pm_opp_get_opp_count(cpu_dev);
 	if (ret <= 0) {
