@@ -24,12 +24,11 @@
  */
 static u64 cpu_min_sample_cntpct __read_mostly = 3 * NSEC_PER_USEC;
 
-/* Max frequencies for SM8650 (kHz) */
+/* Max frequencies for SM8635 (kHz) */
 static const u64 max_freqs[] = {
-	2265600, 2265600,                    /* Cores 0-1 (Silver/LITTLE) */
-	3148800, 3148800, 3148800,           /* Cores 2-4 (Gold/Big) */
-	2956800, 2956800,                    /* Cores 5-6 (Gold+/Big) */
-	3302400                              /* Core 7 (Prime) */
+	2016000, 2016000, 2016000,                    /* Cores 0-2 (Silver/A520) */
+	2707200, 2707200, 2707200, 2707200,           /* Cores 3-6 (Gold/A720)  */
+	2918400                                         /* Core 7 (Prime/X4)    */
 };
 
 /*
