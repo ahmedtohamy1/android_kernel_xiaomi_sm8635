@@ -210,14 +210,22 @@ static int qcom_cpufreq_hw_target_index(struct cpufreq_policy *policy,
 	const struct qcom_cpufreq_soc_data *soc_data = data->soc_data;
 	unsigned long freq = policy->freq_table[index].frequency;
 	unsigned int i;
+	unsigned long flags;
 
 	if (soc_data->perf_lock_support) {
 		if (data->pdmem_base)
 			writel_relaxed(index, data->pdmem_base);
 	}
 
+	/*
+	 * Disable IRQs around the frequency set so that the timestamp
+	 * recorded by FIE is as close to the actual MMIO write as possible.
+	 */
+	local_irq_save(flags);
 	writel_relaxed(index, data->base + soc_data->reg_perf_state);
 
+	fie_rate_set(policy->cpu, freq);
+	local_irq_restore(flags);
 	if (data->per_core_dcvs)
 		for (i = 1; i < cpumask_weight(policy->related_cpus); i++)
 			writel_relaxed(index, data->base + soc_data->reg_perf_state + i * 4);
@@ -285,15 +293,22 @@ static unsigned int qcom_cpufreq_hw_fast_switch(struct cpufreq_policy *policy,
 	const struct qcom_cpufreq_soc_data *soc_data = data->soc_data;
 	unsigned int index;
 	unsigned int i;
+	unsigned int freq;
+
 
 	index = policy->cached_resolved_idx;
+	freq = policy->freq_table[index].frequency;
+
 	writel_relaxed(index, data->base + soc_data->reg_perf_state);
+	fie_rate_set(policy->cpu, freq);
+
 
 	if (data->per_core_dcvs)
 		for (i = 1; i < cpumask_weight(policy->related_cpus); i++)
 			writel_relaxed(index, data->base + soc_data->reg_perf_state + i * 4);
 
-	return policy->freq_table[index].frequency;
+	return freq;
+
 }
 
 static int qcom_cpufreq_hw_read_lut(struct device *cpu_dev,
@@ -504,6 +519,14 @@ static void qcom_lmh_dcvs_notify(struct qcom_cpufreq_data *data)
 		mod_delayed_work(system_highpri_wq, &data->throttle_work,
 				 msecs_to_jiffies(10));
 	}
+
+	/*
+	 * Route the LMh-reported throttled frequency through FIE's thermal
+	 * pressure aggregation. FIE combines this with its own measured HW
+	 * throttle detection for a more accurate thermal pressure report.
+	 */
+	fie_cpufreq_pressure(cpu, thermal_pressure >= policy->cpuinfo.max_freq ?
+			     UINT_MAX : thermal_pressure);
 
 	trace_dcvsh_freq(cpu, qcom_cpufreq_get_freq(cpu), throttled_freq, thermal_pressure);
 
