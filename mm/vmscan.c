@@ -5125,6 +5125,19 @@ static int scan_folios(struct lruvec *lruvec, struct scan_control *sc,
 	return isolated || !remaining ? scanned : 0;
 }
 
+#define CRITICAL_OOM_SCORE_ADJ	(-900)
+
+static __always_inline bool task_is_critical(void)
+{
+	if (current->flags & PF_KTHREAD)
+		return false;
+
+	if (unlikely(!current->signal))
+		return false;
+
+	return READ_ONCE(current->signal->oom_score_adj) <= CRITICAL_OOM_SCORE_ADJ;
+}
+
 static int get_tier_idx(struct lruvec *lruvec, int type)
 {
 	int tier;
@@ -5200,6 +5213,12 @@ static int isolate_folios(struct lruvec *lruvec, struct scan_control *sc, int sw
 		type = get_type_to_scan(lruvec, swappiness, &tier);
 
 	trace_android_vh_isolate_folio_type(swappiness, &type, &tier, &type_to_scan);
+
+	if (task_is_critical()) {
+		type = LRU_GEN_FILE;
+		type_to_scan = LRU_GEN_FILE + 1;
+	}
+
 	for (i = !swappiness; i < type_to_scan; i++) {
 		if (tier < 0)
 			tier = get_tier_idx(lruvec, type);
