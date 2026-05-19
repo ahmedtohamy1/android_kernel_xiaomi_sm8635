@@ -210,7 +210,9 @@ static void set_task_reclaim_state(struct task_struct *task,
 	task->reclaim_state = rs;
 }
 
+
 static LIST_HEAD(shrinker_list);
+static DECLARE_RWSEM(shrinker_rwsem);
 static DEFINE_SPINLOCK(shrinker_lock);
 static DEFINE_RWLOCK(shrinker_rwlock);
 
