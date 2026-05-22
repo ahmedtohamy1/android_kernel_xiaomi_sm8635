@@ -71,8 +71,6 @@ struct qcom_cpufreq_data {
 	void __iomem *pdmem_base;
 	struct resource *res;
 	const struct qcom_cpufreq_soc_data *soc_data;
-unsigned int max_freq;
-	int i;
 	/*
 	 * Mutex to synchronize between de-init sequence and re-starting LMh
 	 * polling/interrupts
@@ -206,10 +204,10 @@ EXPORT_SYMBOL(qcom_cpufreq_get_cpu_cycle_counter);
 static int qcom_cpufreq_hw_target_index(struct cpufreq_policy *policy,
 					unsigned int index)
 {
+	unsigned int i;
 	struct qcom_cpufreq_data *data = policy->driver_data;
 	const struct qcom_cpufreq_soc_data *soc_data = data->soc_data;
 	unsigned long freq = policy->freq_table[index].frequency;
-	unsigned int i;
 	unsigned long flags;
 
 	if (soc_data->perf_lock_support) {
@@ -289,10 +287,10 @@ static unsigned int qcom_cpufreq_hw_get(unsigned int cpu)
 static unsigned int qcom_cpufreq_hw_fast_switch(struct cpufreq_policy *policy,
 						unsigned int target_freq)
 {
+	unsigned int i;
 	struct qcom_cpufreq_data *data = policy->driver_data;
 	const struct qcom_cpufreq_soc_data *soc_data = data->soc_data;
 	unsigned int index;
-	unsigned int i;
 	unsigned int freq;
 
 
@@ -749,6 +747,8 @@ static void qcom_cpufreq_hw_lmh_exit(struct qcom_cpufreq_data *data)
 
 static int qcom_cpufreq_hw_cpu_init(struct cpufreq_policy *policy)
 {
+	unsigned int max_freq = 0;
+	int i;
 	struct platform_device *pdev = cpufreq_get_driver_data();
 	struct device *dev = &pdev->dev;
 	struct of_phandle_args args;

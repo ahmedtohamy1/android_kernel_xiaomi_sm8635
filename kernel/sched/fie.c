@@ -3,6 +3,9 @@
  * Copyright (C) 2024-2025 Sultan Alsawaf <sultan@kerneltoast.com>.
  */
 
+#include <linux/perf/arm_pmuv3.h>
+#include <linux/sched/cputime.h>
+
 #include <linux/cpufreq.h>
 #include <linux/fie.h>
 #include <linux/perf_event.h>
