@@ -47,7 +47,7 @@
 /**************************************************************
  * Default tunables
  */
-#define CPUFREQ_REFLEX_DEFAULT_HISPEED_WINDOW_US   4000
+#define CPUFREQ_REFLEX_DEFAULT_HISPEED_WINDOW_US   8000
 #define CPUFREQ_REFLEX_DEFAULT_HISPEED_FILTER_SHIFT   1
 
 
