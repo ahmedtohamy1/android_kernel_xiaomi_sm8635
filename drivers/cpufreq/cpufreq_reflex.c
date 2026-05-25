@@ -48,7 +48,7 @@
  * Default tunables
  */
 #define CPUFREQ_REFLEX_DEFAULT_HISPEED_WINDOW_US   8000
-#define CPUFREQ_REFLEX_DEFAULT_HISPEED_FILTER_SHIFT   1
+#define CPUFREQ_REFLEX_DEFAULT_HISPEED_FILTER_SHIFT   2
 
 
 /* SCHED_FLAG_SUGOV is private to kernel/sched/sched.h; hardcode here. */
