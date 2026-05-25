@@ -283,6 +283,7 @@ static unsigned int rfx_get_next_freq(struct rfx_policy *rfx_pol,
 	unsigned int freq;
 
 	freq = cpufreq_get_capacity_ref_freq(policy);
+	util = min(util, max);
 	freq = map_util_freq(util, freq, max);
 
 	if (freq == rfx_pol->cached_raw_freq && !rfx_pol->need_freq_update)
