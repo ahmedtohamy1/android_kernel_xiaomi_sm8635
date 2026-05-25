@@ -986,12 +986,13 @@ void cpufreq_get_effective_util(int cpu, unsigned long boost,
 				unsigned long *out_util,
 				unsigned long *out_bw_min)
 {
-	unsigned long min = 0;
+	unsigned long min = 0, max = 0;
 	unsigned long util;
+
 
 	util = cpu_util_cfs(cpu);
 
-	util = effective_cpu_util(cpu, util, NULL, NULL);
+	util = effective_cpu_util(cpu, util, &min, &max);
 	util = max(util, boost);
 
 	*out_bw_min = min;
