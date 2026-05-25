@@ -977,7 +977,7 @@ static int rfx_init(struct cpufreq_policy *policy)
 	}
 
 	/* Default tunable values */
-	tunables->rate_limit_us = cpufreq_policy_transition_delay_us(policy);
+	tunables->rate_limit_us =  max(cpufreq_policy_transition_delay_us(policy), 2000U);
 	tunables->hispeed_window_us = CPUFREQ_REFLEX_DEFAULT_HISPEED_WINDOW_US;
 	tunables->hispeed_filter_shift = CPUFREQ_REFLEX_DEFAULT_HISPEED_FILTER_SHIFT;
 
