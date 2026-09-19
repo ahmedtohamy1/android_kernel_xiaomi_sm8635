@@ -121,6 +121,13 @@ bool cass_cpu_better(const struct cass_cpu_cand *a,
 	if (cass_cmp(cass_prime_cpu(b), cass_prime_cpu(a)))
 		goto done;
 
+	/* Prefer the smaller CPU when both are idle and the task fits */
+	if (a->exit_lat && b->exit_lat &&
+	    cass_cmp(b->cap_orig, a->cap_orig) &&
+	    fits_capacity(p_util, a->cap_max))
+	    goto done;
+
+
 	/* Prefer the CPU with lower relative utilization */
 	if (cass_cmp(b->util, a->util))
 		goto done;
